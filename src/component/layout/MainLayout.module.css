@@ -1,0 +1,142 @@
+.layout {
+  display: flex;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  position: relative;
+}
+
+.mainContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  margin-left: 80px; /* Account for wider sidebar */
+  min-height: 100vh;
+  background: linear-gradient(to bottom, #ffffff 0%, #f8f9fa 100%);
+  padding-top: 60px; /* Account for fixed navbar */
+  transition: all 0.3s ease;
+  box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.mainContent.blurred {
+  filter: blur(4px);
+  transform: scale(0.98);
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.contentArea {
+  flex: 1;
+  padding: 20px 30px;
+  overflow-y: auto;
+}
+
+.manufacturingContent {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.contentPlaceholder {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 40px;
+  text-align: center;
+}
+
+.contentPlaceholder h2 {
+  color: #333;
+  margin-bottom: 15px;
+  font-size: 24px;
+}
+
+.contentPlaceholder p {
+  color: #666;
+  font-size: 16px;
+  margin: 0;
+}
+
+@media (max-width: 1024px) {
+  .mainContent {
+    margin-left: 70px;
+  }
+
+  .contentArea {
+    padding: 15px 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    flex-direction: column;
+  }
+
+  .mainContent {
+    margin-left: 0;
+    padding-top: 50px; /* Smaller navbar on mobile */
+    padding-bottom: 60px; /* Account for mobile sidebar at bottom */
+  }
+
+  .contentArea {
+    padding: 12px 16px;
+  }
+
+  .manufacturingContent {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .contentPlaceholder {
+    padding: 20px 16px;
+  }
+
+  .contentPlaceholder h2 {
+    font-size: 20px;
+  }
+
+  .contentPlaceholder p {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .mainContent {
+    padding-top: 45px; /* Even smaller navbar on small mobile */
+    padding-bottom: 70px; /* More space for mobile sidebar */
+  }
+
+  .contentArea {
+    padding: 8px 12px;
+  }
+
+  .manufacturingContent {
+    gap: 12px;
+  }
+
+  .contentPlaceholder {
+    padding: 16px 12px;
+  }
+
+  .contentPlaceholder h2 {
+    font-size: 18px;
+  }
+
+  .contentPlaceholder p {
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 360px) {
+  .mainContent {
+    padding-top: 40px;
+    padding-bottom: 75px;
+  }
+
+  .contentArea {
+    padding: 6px 10px;
+  }
+
+  .manufacturingContent {
+    gap: 10px;
+  }
+}

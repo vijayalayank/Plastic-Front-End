@@ -1,0 +1,478 @@
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px;
+  font-family: Arial, sans-serif;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  margin-bottom: 20px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #ddd;
+}
+
+.title {
+  font-size: 24px;
+  font-weight: bold;
+  color: #333;
+  margin: 0;
+}
+
+.editButton {
+  padding: 8px 20px;
+  background-color: #fff;
+  border: 2px solid #333;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.editButton:hover {
+  background-color: #f0f0f0;
+}
+
+.detailsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 30px;
+  margin-bottom: 30px;
+}
+
+.detailsSection {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.fieldGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.label {
+  font-weight: bold;
+  color: #333;
+  font-size: 14px;
+}
+
+.input {
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+  background-color: #fff;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.displayValue {
+  padding: 8px 12px;
+  background-color: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 4px;
+  font-size: 14px;
+  color: #495057;
+  min-height: 38px;
+  display: flex;
+  align-items: center;
+}
+
+.timeTable {
+  margin-bottom: 20px;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.table th,
+.table td {
+  border: 1px solid #ddd;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.timeHeader {
+  background-color: #f8f9fa;
+  font-weight: bold;
+  padding: 12px 8px;
+  width: 120px;
+  text-align: left;
+}
+
+.timeSlot {
+  background-color: #f8f9fa;
+  font-weight: bold;
+  padding: 12px 8px;
+  min-width: 80px;
+}
+
+.rowLabel {
+  background-color: #f8f9fa;
+  font-weight: bold;
+  padding: 12px 8px;
+  text-align: left;
+  width: 120px;
+}
+
+.cell {
+  padding: 12px 8px;
+  height: 40px;
+  background-color: #fff;
+  min-width: 80px;
+}
+
+.bottomTable {
+  margin-top: 20px;
+}
+
+.expenseHeader {
+  background-color: #f8f9fa;
+  font-weight: bold;
+  padding: 12px 8px;
+  text-align: left;
+  width: 120px;
+}
+
+.bottomCell {
+  padding: 12px 8px;
+  border: 1px solid #ddd;
+  text-align: center;
+  background-color: #fff;
+  min-width: 100px;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .detailsGrid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  
+  .container {
+    padding: 10px;
+  }
+  
+  .header {
+    flex-direction: column;
+    gap: 15px;
+    align-items: flex-start;
+  }
+  
+  .table {
+    font-size: 12px;
+  }
+  
+  .timeSlot,
+  .cell,
+  .bottomCell {
+    min-width: 60px;
+    padding: 8px 4px;
+  }
+}
+
+/* Modal Styles */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.modalContent {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  max-width: 90vw;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+}
+
+.modalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 30px;
+  border-bottom: 2px solid #eee;
+  background-color: #f8f9fa;
+  border-radius: 8px 8px 0 0;
+}
+
+.modalTitle {
+  font-size: 24px;
+  font-weight: bold;
+  color: #333;
+  margin: 0;
+}
+
+.closeButton {
+  background: none;
+  border: none;
+  font-size: 24px;
+  font-weight: bold;
+  color: #666;
+  cursor: pointer;
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.closeButton:hover {
+  background-color: #e9ecef;
+  color: #333;
+}
+
+.modalBody {
+  padding: 30px;
+}
+
+/* Edit Mode Styles */
+.editForm {
+  background-color: #fff;
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.editSection {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+  margin-bottom: 40px;
+  padding-bottom: 30px;
+  border-bottom: 2px solid #eee;
+}
+
+.editField {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.editLabel {
+  font-weight: bold;
+  color: #333;
+  min-width: 140px;
+  font-size: 14px;
+}
+
+.editInput {
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+  background-color: #fff;
+  flex: 1;
+  max-width: 150px;
+}
+
+.editInput:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.timeSlotEdit {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 30px;
+  margin-bottom: 30px;
+}
+
+.timeSlotSection {
+  background-color: #f8f9fa;
+  padding: 20px;
+  border-radius: 6px;
+  border: 1px solid #dee2e6;
+}
+
+.timeSlotTitle {
+  font-size: 16px;
+  font-weight: bold;
+  color: #333;
+  margin: 0 0 15px 0;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #ddd;
+}
+
+.timeSlotFields {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.summaryEdit {
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 2px solid #eee;
+}
+
+.summaryTitle {
+  font-size: 16px;
+  font-weight: bold;
+  color: #333;
+  margin: 0 0 15px 0;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #ddd;
+}
+
+.summaryFields {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
+}
+
+.editActions {
+  display: flex;
+  justify-content: center;
+  padding-top: 20px;
+}
+
+.saveButton {
+  padding: 12px 30px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.saveButton:hover {
+  background-color: #0056b3;
+}
+
+@media (max-width: 768px) {
+  .modalOverlay {
+    padding: 10px;
+  }
+
+  .modalContent {
+    max-width: 95vw;
+    max-height: 95vh;
+  }
+
+  .modalHeader {
+    padding: 15px 20px;
+  }
+
+  .modalTitle {
+    font-size: 20px;
+  }
+
+  .modalBody {
+    padding: 20px;
+  }
+
+  .editSection {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+
+  .timeSlotEdit {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .editField {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+  }
+
+  .editLabel {
+    min-width: auto;
+  }
+
+  .editInput {
+    max-width: 100%;
+    width: 100%;
+  }
+
+  .summaryFields {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .modalOverlay {
+    padding: 5px;
+  }
+
+  .modalContent {
+    max-width: 98vw;
+    max-height: 98vh;
+  }
+
+  .modalHeader {
+    padding: 10px 15px;
+  }
+
+  .modalTitle {
+    font-size: 18px;
+  }
+
+  .modalBody {
+    padding: 15px;
+  }
+
+  .title {
+    font-size: 20px;
+  }
+
+  .table {
+    font-size: 10px;
+  }
+
+  .timeSlot,
+  .cell,
+  .bottomCell {
+    min-width: 50px;
+    padding: 6px 2px;
+  }
+
+  .editForm {
+    padding: 15px;
+  }
+
+  .timeSlotSection {
+    padding: 15px;
+  }
+}

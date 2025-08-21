@@ -1,0 +1,108 @@
+.topBar {
+  display: flex;
+  align-items: center;
+  background-color: #fff;
+  border-bottom: 1px solid #e0e0e0;
+  padding: 12px 24px;
+  min-height: 60px;
+}
+
+.leftSection {
+  display: flex;
+  align-items: center;
+}
+
+.logoContainer {
+  display: flex;
+  align-items: center;
+}
+
+.logo {
+  width: 40px;
+  height: 40px;
+  background-color: #333;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+}
+
+.logoIcon {
+  color: #fff;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.centerSection {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  margin-left: 24px;
+}
+
+.divider {
+  width: 100%;
+  height: 1px;
+  background-color: #e0e0e0;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .topBar {
+    padding: 10px 20px;
+    min-height: 50px;
+  }
+  
+  .logo {
+    width: 36px;
+    height: 36px;
+  }
+  
+  .logoIcon {
+    font-size: 18px;
+  }
+  
+  .centerSection {
+    margin-left: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .topBar {
+    padding: 8px 16px;
+    min-height: 45px;
+  }
+  
+  .logo {
+    width: 32px;
+    height: 32px;
+  }
+  
+  .logoIcon {
+    font-size: 16px;
+  }
+  
+  .centerSection {
+    margin-left: 16px;
+  }
+}
+
+@media (max-width: 360px) {
+  .topBar {
+    padding: 6px 12px;
+    min-height: 40px;
+  }
+  
+  .logo {
+    width: 28px;
+    height: 28px;
+  }
+  
+  .logoIcon {
+    font-size: 14px;
+  }
+  
+  .centerSection {
+    margin-left: 12px;
+  }
+}

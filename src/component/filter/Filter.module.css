@@ -1,0 +1,338 @@
+.filter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  min-height: 70px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.navigationControls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.navButton {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  padding: 10px 14px;
+  border-radius: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  min-width: 44px;
+  height: 40px;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.navButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+.navIcon {
+  font-size: 16px;
+  color: #fff;
+  font-weight: bold;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.dateSection {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  border: 1px solid rgba(102, 126, 234, 0.3);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 4px;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.dateSection:hover {
+  border-color: rgba(102, 126, 234, 0.6);
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.2);
+}
+
+.dateSection:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.3);
+}
+
+.dateInput {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+  width: 100%;
+  height: 100%;
+  z-index: 10;
+}
+
+.dateDisplay {
+  padding: 8px 12px;
+  font-size: 14px;
+  color: #333;
+  background: transparent;
+  min-width: 100px;
+  cursor: pointer;
+  user-select: none;
+  flex: 1;
+}
+
+.calendarButton {
+  background: none;
+  border: none;
+  padding: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 2px;
+  transition: background-color 0.3s ease;
+}
+
+.calendarButton:hover {
+  background-color: #f0f0f0;
+}
+
+.calendarIcon {
+  font-size: 16px;
+}
+
+.rightSection {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.actionButton {
+  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  border: none;
+  padding: 10px 20px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #fff;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  height: 40px;
+  box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+}
+
+.actionButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+}
+
+.buttonText {
+  font-weight: 500;
+}
+
+.filterDropdown {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.filterSelect {
+  appearance: none;
+  background-color: #fff;
+  border: 1px solid #d0d0d0;
+  padding: 8px 32px 8px 12px;
+  border-radius: 4px;
+  font-size: 14px;
+  color: #333;
+  cursor: pointer;
+  min-width: 120px;
+  height: 36px;
+  transition: all 0.3s ease;
+}
+
+.filterSelect:hover {
+  border-color: #b0b0b0;
+}
+
+.filterSelect:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.dropdownArrow {
+  position: absolute;
+  right: 8px;
+  pointer-events: none;
+  color: #666;
+  font-size: 12px;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .filter {
+    padding: 10px 20px;
+    min-height: 55px;
+  }
+
+  .navigationControls {
+    gap: 10px;
+  }
+
+  .rightSection {
+    gap: 14px;
+  }
+
+  .dateInput {
+    min-width: 90px;
+  }
+
+  .filterSelect {
+    min-width: 110px;
+  }
+}
+
+@media (max-width: 768px) {
+  .filter {
+    padding: 8px 16px;
+    flex-direction: column;
+    gap: 12px;
+    align-items: stretch;
+    min-height: auto;
+  }
+
+  .navigationControls {
+    justify-content: center;
+    order: 2;
+  }
+
+  .rightSection {
+    justify-content: center;
+    gap: 12px;
+    order: 1;
+  }
+
+  .dateInput {
+    min-width: 80px;
+  }
+
+  .filterSelect {
+    min-width: 100px;
+  }
+
+  .actionButton {
+    flex: 1;
+    max-width: 200px;
+  }
+}
+
+@media (max-width: 480px) {
+  .filter {
+    padding: 6px 12px;
+    gap: 10px;
+  }
+
+  .navigationControls {
+    gap: 6px;
+  }
+
+  .rightSection {
+    gap: 8px;
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .navButton {
+    min-width: 34px;
+    height: 32px;
+    padding: 6px 8px;
+  }
+
+  .actionButton {
+    height: 32px;
+    padding: 6px 12px;
+    font-size: 13px;
+    flex: 1;
+    min-width: 120px;
+  }
+
+  .filterSelect {
+    height: 32px;
+    padding: 6px 28px 6px 10px;
+    font-size: 13px;
+    min-width: 80px;
+    flex: 1;
+  }
+
+  .dateInput {
+    padding: 6px 8px;
+    font-size: 13px;
+    min-width: 60px;
+  }
+
+  .dateSection {
+    flex: 1;
+    min-width: 100px;
+  }
+}
+
+@media (max-width: 360px) {
+  .filter {
+    padding: 5px 10px;
+    gap: 8px;
+  }
+
+  .navigationControls {
+    gap: 4px;
+  }
+
+  .rightSection {
+    gap: 6px;
+    flex-direction: column;
+  }
+
+  .navButton {
+    min-width: 30px;
+    height: 28px;
+    padding: 4px 6px;
+  }
+
+  .navIcon {
+    font-size: 14px;
+  }
+
+  .actionButton {
+    height: 28px;
+    padding: 4px 8px;
+    font-size: 12px;
+  }
+
+  .filterSelect {
+    height: 28px;
+    padding: 4px 24px 4px 8px;
+    font-size: 12px;
+    min-width: 70px;
+  }
+
+  .dateInput {
+    padding: 4px 6px;
+    font-size: 12px;
+    min-width: 50px;
+  }
+
+  .calendarButton {
+    padding: 4px;
+  }
+
+  .calendarIcon {
+    font-size: 14px;
+  }
+}
