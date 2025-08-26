@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import QRCode from 'react-qr-code';
+import QRScanner from '../qr-scanner';
 import { usePopup } from '../../context/PopupContext';
+import { batchService } from '../../services/batchService';
 import styles from './PopupManager.module.css';
 
 const PopupManager = ({ batches, onBatchUpdate }) => {
@@ -11,6 +13,23 @@ const PopupManager = ({ batches, onBatchUpdate }) => {
     neckSize: '',
     numberOfPieces: '',
     qcPassed: ''
+  });
+
+  const [packageFormData, setPackageFormData] = useState({
+    name: '',
+    invoiceId: '',
+    batches: [],
+    status: 'Active',
+    description: ''
+  });
+
+  const [scannedBatch, setScannedBatch] = useState('');
+  const [isQRScannerOpen, setIsQRScannerOpen] = useState(false);
+  const [batchValidation, setBatchValidation] = useState({
+    isValidating: false,
+    isValid: null,
+    message: '',
+    foundBatch: null
   });
 
 
@@ -35,6 +54,40 @@ const PopupManager = ({ batches, onBatchUpdate }) => {
           qcPassed: ''
         });
       }
+    } else if (activePopup === 'addPackage') {
+      // Adding new package
+      setPackageFormData({
+        name: '',
+        invoiceId: '',
+        batches: [],
+        status: 'Active',
+        description: ''
+      });
+      setScannedBatch('');
+      setIsQRScannerOpen(false);
+      setBatchValidation({
+        isValidating: false,
+        isValid: null,
+        message: '',
+        foundBatch: null
+      });
+    } else if (activePopup === 'editPackage' && popupData?.package) {
+      // Editing existing package
+      setPackageFormData({
+        name: popupData.package.name,
+        invoiceId: popupData.package.invoiceId,
+        batches: [...popupData.package.batches],
+        status: popupData.package.status,
+        description: popupData.package.description
+      });
+      setScannedBatch('');
+      setIsQRScannerOpen(false);
+      setBatchValidation({
+        isValidating: false,
+        isValid: null,
+        message: '',
+        foundBatch: null
+      });
     }
   }, [activePopup, popupData]);
 
@@ -45,12 +98,186 @@ const PopupManager = ({ batches, onBatchUpdate }) => {
     }));
   };
 
+  const handlePackageInputChange = (field, value) => {
+    setPackageFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+
+
+  const handleRemoveBatch = (batchToRemove) => {
+    setPackageFormData(prev => ({
+      ...prev,
+      batches: prev.batches.filter(batch => batch !== batchToRemove)
+    }));
+  };
+
+  const handleScannedBatchChange = (value) => {
+    setScannedBatch(value);
+  };
+
+  const handleScannedBatchKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleValidateBatch();
+    }
+  };
+
+  const handleValidateBatch = async () => {
+    if (!scannedBatch.trim()) return;
+
+    setBatchValidation({
+      isValidating: true,
+      isValid: null,
+      message: 'Validating batch...',
+      foundBatch: null
+    });
+
+    try {
+      const foundBatch = await batchService.findBatch(scannedBatch.trim());
+
+      if (foundBatch) {
+        setBatchValidation({
+          isValidating: false,
+          isValid: true,
+          message: `Found: ${foundBatch.batchName}`,
+          foundBatch: foundBatch
+        });
+      } else {
+        setBatchValidation({
+          isValidating: false,
+          isValid: false,
+          message: 'Batch not found in database',
+          foundBatch: null
+        });
+      }
+    } catch (error) {
+      setBatchValidation({
+        isValidating: false,
+        isValid: false,
+        message: 'Error validating batch',
+        foundBatch: null
+      });
+    }
+  };
+
+  const handleAddValidatedBatch = () => {
+    alert('Add Batch button clicked!'); // Temporary debug alert
+
+    const batchToAdd = batchValidation.foundBatch
+      ? batchValidation.foundBatch.batchCode
+      : scannedBatch.trim();
+
+    if (batchToAdd && !packageFormData.batches.includes(batchToAdd)) {
+      setPackageFormData(prev => ({
+        ...prev,
+        batches: [...prev.batches, batchToAdd]
+      }));
+      setScannedBatch('');
+      setBatchValidation({
+        isValidating: false,
+        isValid: null,
+        message: '',
+        foundBatch: null
+      });
+      alert(`Batch "${batchToAdd}" added successfully!`); // Success alert
+    } else {
+      alert(`Batch "${batchToAdd}" not added - either empty or already exists`); // Error alert
+    }
+  };
+
+  const handleAddManually = () => {
+    if (scannedBatch.trim() && !packageFormData.batches.includes(scannedBatch.trim())) {
+      setPackageFormData(prev => ({
+        ...prev,
+        batches: [...prev.batches, scannedBatch.trim()]
+      }));
+      setScannedBatch('');
+      setBatchValidation({
+        isValidating: false,
+        isValid: null,
+        message: '',
+        foundBatch: null
+      });
+    }
+  };
+
+  const handleOpenQRScanner = () => {
+    setIsQRScannerOpen(true);
+  };
+
+  const handleCloseQRScanner = () => {
+    setIsQRScannerOpen(false);
+  };
+
+  const handleQRScan = async (qrData) => {
+    setIsQRScannerOpen(false);
+
+    // Parse QR data to extract batch information
+    const parsedData = batchService.parseQRData(qrData);
+
+    if (parsedData) {
+      setScannedBatch(parsedData.batchCode);
+
+      // Auto-validate the scanned batch
+      setBatchValidation({
+        isValidating: true,
+        isValid: null,
+        message: 'Validating scanned batch...',
+        foundBatch: null
+      });
+
+      try {
+        const foundBatch = await batchService.findBatch(parsedData.batchCode);
+
+        if (foundBatch) {
+          setBatchValidation({
+            isValidating: false,
+            isValid: true,
+            message: `Scanned: ${foundBatch.batchName}`,
+            foundBatch: foundBatch
+          });
+        } else {
+          setBatchValidation({
+            isValidating: false,
+            isValid: false,
+            message: 'Scanned batch not found in database',
+            foundBatch: null
+          });
+        }
+      } catch (error) {
+        setBatchValidation({
+          isValidating: false,
+          isValid: false,
+          message: 'Error validating scanned batch',
+          foundBatch: null
+        });
+      }
+    } else {
+      setScannedBatch(qrData);
+      setBatchValidation({
+        isValidating: false,
+        isValid: false,
+        message: 'Invalid QR code format',
+        foundBatch: null
+      });
+    }
+  };
+
 
 
   const handleSaveChanges = () => {
     if (onBatchUpdate) {
       onBatchUpdate(formData, popupData);
     }
+    closePopup();
+  };
+
+  const handleSavePackage = () => {
+    // Here you would typically save the package data to a backend
+    console.log('Saving package data:', packageFormData);
     closePopup();
   };
 
@@ -231,6 +458,359 @@ const PopupManager = ({ batches, onBatchUpdate }) => {
         </div>
       )}
 
+      {/* Add Package Modal */}
+      {activePopup === 'addPackage' && (
+        <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+          <div className={styles.modalHeader}>
+            <h2 className={styles.modalTitle}>Add Package</h2>
+            <button className={styles.closeButton} onClick={closePopup}>
+              ×
+            </button>
+          </div>
+
+          <div className={styles.modalBody}>
+            <div className={styles.packageFormSection}>
+              {/* Package Name and Scan Section */}
+              <div className={styles.formRow}>
+                <div className={styles.formField}>
+                  <input
+                    type="text"
+                    className={styles.fieldInput}
+                    value={packageFormData.name}
+                    onChange={(e) => handlePackageInputChange('name', e.target.value)}
+                    placeholder="package name"
+                  />
+                </div>
+                <div className={styles.scanSection}>
+                  <input
+                    type="text"
+                    className={`${styles.scanInput} ${
+                      batchValidation.isValid === true ? styles.validInput :
+                      batchValidation.isValid === false ? styles.invalidInput : ''
+                    }`}
+                    value={scannedBatch}
+                    onChange={(e) => handleScannedBatchChange(e.target.value)}
+                    onKeyPress={handleScannedBatchKeyPress}
+                    placeholder="Scan or enter batch code"
+                    disabled={batchValidation.isValidating}
+                  />
+                  <button
+                    className={styles.scanButton}
+                    onClick={handleOpenQRScanner}
+                    type="button"
+                    disabled={batchValidation.isValidating}
+                  >
+                    📷 Scan
+                  </button>
+                </div>
+
+                {/* Batch Validation Section */}
+                {(batchValidation.message || scannedBatch.trim()) && (
+                  <div className={styles.validationSection}>
+                    {batchValidation.isValidating && (
+                      <div className={styles.validationMessage}>
+                        <span className={styles.loadingSpinner}>⏳</span>
+                        {batchValidation.message}
+                      </div>
+                    )}
+
+                    {!batchValidation.isValidating && batchValidation.isValid === true && (
+                      <div className={styles.validationMessage}>
+                        <span className={styles.successIcon}>✅</span>
+                        {batchValidation.message}
+                        <button
+                          className={styles.addBatchButton}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            handleAddValidatedBatch();
+                          }}
+                          type="button"
+                        >
+                          Add Batch
+                        </button>
+                      </div>
+                    )}
+
+                    {!batchValidation.isValidating && batchValidation.isValid === false && scannedBatch.trim() && (
+                      <div className={styles.validationMessage}>
+                        <span className={styles.errorIcon}>❌</span>
+                        {batchValidation.message}
+                        <button
+                          className={styles.addManuallyButton}
+                          onClick={handleAddManually}
+                          type="button"
+                        >
+                          Add Manually
+                        </button>
+                      </div>
+                    )}
+
+                    {!batchValidation.isValidating && !batchValidation.message && scannedBatch.trim() && (
+                      <div className={styles.validationActions}>
+                        <button
+                          className={styles.validateButton}
+                          onClick={handleValidateBatch}
+                          type="button"
+                        >
+                          Validate Batch
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* Added Batches Section */}
+              <div className={styles.addedBatchesSection}>
+                <h3 className={styles.sectionTitle}>Added batches</h3>
+                <div className={styles.batchesList}>
+                  {packageFormData.batches.length === 0 ? (
+                    <p className={styles.noBatches}>No batches added yet</p>
+                  ) : (
+                    packageFormData.batches.map((batch, index) => (
+                      <div key={index} className={styles.batchItem}>
+                        <span className={styles.batchCode}>{batch}</span>
+                        <button
+                          className={styles.removeBatchButton}
+                          onClick={() => handleRemoveBatch(batch)}
+                          type="button"
+                        >
+                          ×
+                        </button>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+
+              {/* Invoice ID Section */}
+              <div className={styles.invoiceSection}>
+                <input
+                  type="text"
+                  className={styles.invoiceInput}
+                  value={packageFormData.invoiceId}
+                  onChange={(e) => handlePackageInputChange('invoiceId', e.target.value)}
+                  placeholder="add Invoice ID"
+                />
+              </div>
+            </div>
+
+            <div className={styles.modalActions}>
+              <button className={styles.createButton} onClick={handleSavePackage}>
+                Create package and Gen
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Package Modal */}
+      {activePopup === 'editPackage' && popupData?.package && (
+        <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+          <div className={styles.modalHeader}>
+            <h2 className={styles.modalTitle}>Edit Package</h2>
+            <button className={styles.closeButton} onClick={closePopup}>
+              ×
+            </button>
+          </div>
+
+          <div className={styles.modalBody}>
+            <div className={styles.packageFormSection}>
+              {/* Package Name and Scan Section */}
+              <div className={styles.formRow}>
+                <div className={styles.formField}>
+                  <input
+                    type="text"
+                    className={styles.fieldInput}
+                    value={packageFormData.name}
+                    onChange={(e) => handlePackageInputChange('name', e.target.value)}
+                    placeholder="package name"
+                  />
+                </div>
+                <div className={styles.scanSection}>
+                  <input
+                    type="text"
+                    className={`${styles.scanInput} ${
+                      batchValidation.isValid === true ? styles.validInput :
+                      batchValidation.isValid === false ? styles.invalidInput : ''
+                    }`}
+                    value={scannedBatch}
+                    onChange={(e) => handleScannedBatchChange(e.target.value)}
+                    onKeyPress={handleScannedBatchKeyPress}
+                    placeholder="Scan or enter batch code"
+                    disabled={batchValidation.isValidating}
+                  />
+                  <button
+                    className={styles.scanButton}
+                    onClick={handleOpenQRScanner}
+                    type="button"
+                    disabled={batchValidation.isValidating}
+                  >
+                    📷 Scan
+                  </button>
+                </div>
+
+                {/* Batch Validation Section */}
+                {(batchValidation.message || scannedBatch.trim()) && (
+                  <div className={styles.validationSection}>
+                    {batchValidation.isValidating && (
+                      <div className={styles.validationMessage}>
+                        <span className={styles.loadingSpinner}>⏳</span>
+                        {batchValidation.message}
+                      </div>
+                    )}
+
+                    {!batchValidation.isValidating && batchValidation.isValid === true && (
+                      <div className={styles.validationMessage}>
+                        <span className={styles.successIcon}>✅</span>
+                        {batchValidation.message}
+                        <button
+                          className={styles.addBatchButton}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            handleAddValidatedBatch();
+                          }}
+                          type="button"
+                        >
+                          Add Batch
+                        </button>
+                      </div>
+                    )}
+
+                    {!batchValidation.isValidating && batchValidation.isValid === false && scannedBatch.trim() && (
+                      <div className={styles.validationMessage}>
+                        <span className={styles.errorIcon}>❌</span>
+                        {batchValidation.message}
+                        <button
+                          className={styles.addManuallyButton}
+                          onClick={handleAddManually}
+                          type="button"
+                        >
+                          Add Manually
+                        </button>
+                      </div>
+                    )}
+
+                    {!batchValidation.isValidating && !batchValidation.message && scannedBatch.trim() && (
+                      <div className={styles.validationActions}>
+                        <button
+                          className={styles.validateButton}
+                          onClick={handleValidateBatch}
+                          type="button"
+                        >
+                          Validate Batch
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* Added Batches Section */}
+              <div className={styles.addedBatchesSection}>
+                <h3 className={styles.sectionTitle}>Added batches</h3>
+                <div className={styles.batchesList}>
+                  {packageFormData.batches.length === 0 ? (
+                    <p className={styles.noBatches}>No batches added yet</p>
+                  ) : (
+                    packageFormData.batches.map((batch, index) => (
+                      <div key={index} className={styles.batchItem}>
+                        <span className={styles.batchCode}>{batch}</span>
+                        <button
+                          className={styles.removeBatchButton}
+                          onClick={() => handleRemoveBatch(batch)}
+                          type="button"
+                        >
+                          ×
+                        </button>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+
+              {/* Invoice ID Section */}
+              <div className={styles.invoiceSection}>
+                <input
+                  type="text"
+                  className={styles.invoiceInput}
+                  value={packageFormData.invoiceId}
+                  onChange={(e) => handlePackageInputChange('invoiceId', e.target.value)}
+                  placeholder="add Invoice ID"
+                />
+              </div>
+            </div>
+
+            <div className={styles.modalActions}>
+              <button className={styles.saveButton} onClick={handleSavePackage}>
+                Save Changes
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* View Package Modal */}
+      {activePopup === 'viewPackage' && popupData?.package && (
+        <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+          <div className={styles.modalHeader}>
+            <h2 className={styles.modalTitle}>Package Details</h2>
+            <button className={styles.closeButton} onClick={closePopup}>
+              ×
+            </button>
+          </div>
+
+          <div className={styles.modalBody}>
+            <div className={styles.packageViewSection}>
+              <div className={styles.viewRow}>
+                <span className={styles.viewLabel}>Package Name:</span>
+                <span className={styles.viewValue}>{popupData.package.name}</span>
+              </div>
+              <div className={styles.viewRow}>
+                <span className={styles.viewLabel}>Invoice ID:</span>
+                <span className={styles.viewValue}>{popupData.package.invoiceId}</span>
+              </div>
+              <div className={styles.viewRow}>
+                <span className={styles.viewLabel}>Total Batches:</span>
+                <span className={styles.viewValue}>{popupData.package.totalBatches}</span>
+              </div>
+              <div className={styles.viewRow}>
+                <span className={styles.viewLabel}>Status:</span>
+                <span className={`${styles.viewValue} ${styles.statusBadge} ${styles[popupData.package.status.toLowerCase()]}`}>
+                  {popupData.package.status}
+                </span>
+              </div>
+              <div className={styles.viewRow}>
+                <span className={styles.viewLabel}>Created Date:</span>
+                <span className={styles.viewValue}>{popupData.package.createdDate}</span>
+              </div>
+              <div className={styles.viewRow}>
+                <span className={styles.viewLabel}>Description:</span>
+                <span className={styles.viewValue}>{popupData.package.description}</span>
+              </div>
+              <div className={styles.viewBatchesSection}>
+                <span className={styles.viewLabel}>Batches:</span>
+                <div className={styles.viewBatchesList}>
+                  {popupData.package.batches.map((batch, index) => (
+                    <span key={index} className={styles.viewBatchTag}>
+                      {batch}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* QR Scanner */}
+      <QRScanner
+        isActive={isQRScannerOpen}
+        onScan={handleQRScan}
+        onClose={handleCloseQRScanner}
+      />
 
     </div>
   );

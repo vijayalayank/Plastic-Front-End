@@ -6,6 +6,7 @@ import Filter from '../filter';
 import Heading from '../heading';
 import ShiftDetails from '../shift-details';
 import Batches from '../batches';
+import Packages from '../packages';
 import PopupManager from '../popup/PopupManager';
 import { PopupProvider, usePopup } from '../../context/PopupContext';
 import styles from './MainLayout.module.css';
@@ -43,13 +44,8 @@ const MainContent = () => {
             />
           </div>
         );
-      case 'analytics':
-        return (
-          <div className={styles.contentPlaceholder}>
-            <h2>Analytics Dashboard</h2>
-            <p>Analytics content will be displayed here.</p>
-          </div>
-        );
+      case 'package':
+        return <Packages />;
       case 'stocks':
         return (
           <div className={styles.contentPlaceholder}>
@@ -71,8 +67,8 @@ const MainContent = () => {
     switch (activeMenuItem) {
       case 'manufacturing':
         return 'Manufacturing';
-      case 'analytics':
-        return 'Analytics';
+      case 'package':
+        return 'Packaging';
       case 'stocks':
         return 'Stocks';
       default:

@@ -4,8 +4,8 @@ import styles from './Sidebar.module.css';
 const Sidebar = ({ activeItem, onItemClick }) => {
   const menuItems = [
     { id: 'manufacturing', label: 'Manufacturing', icon: '🏭' },
-    { id: 'analytics', label: 'Analytics', icon: '📊' },
-    { id: 'stocks', label: 'Stocks', icon: '📦' }
+    { id: 'package', label: 'Package', icon: '📦' },
+    { id: 'stocks', label: 'Stocks', icon: '📊' }
   ];
 
   return (
